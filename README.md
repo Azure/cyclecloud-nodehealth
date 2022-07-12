@@ -1,14 +1,165 @@
-# Project
+# Azure HPC Node Healthchecks
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+Azure-healthcheck project is a helper that is capable of running custom healthcheck scripts and reporting on any issues with the virtual machine upon its initialization.
 
-As the maintainer of this project, please make a few updates:
+This project supports [NHC](https://github.com/mej/nhc) healthcheck scripts and allows the addition of custom scripts. This was achieved with the help of work by Cormac Garvey, [cc_slurm_nhc](https://github.com/Azure/azurehpc/tree/master/experimental/cc_slurm_nhc). To learn more about this project and the advantages of running GPU healthchecks, refer to [this article](https://techcommunity.microsoft.com/t5/azure-global/automated-hpc-ai-compute-node-health-checks-integrated-with-the/ba-p/3113454).
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+## Installation 
+
+### Pre-requisites
+The instructions below assume that:
+
+* you have a valid CycleCloud subscription
+* you have access to the Azure VM
+* your Azure VM runs a linux-based operating system and supports bash commands
+* You have CycleCloud CLI installed and congigured. Refer to [this instruction](https://docs.microsoft.com/en-us/azure/cyclecloud/how-to/install-cyclecloud-cli?view=cyclecloud-8) for the installation steps
+
+### Building the project
+
+The project comes with a pre-built binary used to run the test scripts and build reports compatible with linux-x64. If you wish to build the source yourself, you will need to install .NET Core. Please refer to the deploy.sh for an example of steps you need to take
+
+### Uploading the project to the Azure locker
+
+In order for you to be able to add the project to your CycleCloud cluster, you will first need to upload it to your Azure Locker. 
+
+```bash
+cyclecloud project upload your-locker-name
+```
+
+### Customizing healtchecks
+
+All the customizable parameters of the healthcheck tool are located under [[[configuration healthchecks]]] section of the cluster template file.
+
+The parameters you can change are:
+
+| Parameter | Meaning | Default value | 
+| --- | --- | --- | 
+| healthchecks.report | Full path to where the report would be generated | /var/log/healthreport.json |
+| healthchecks.custom.pattern | Pattern used to detect custom scripts | *.sh |
+| healthchecks.nhc.config | Name of the configuration file you want the NHC tool to use | None |
+| healthchecks.nhc.log | Full path to where NHC will store its full report | /var/log/nhc.log | 
+| healthchecks.appinsights.InstrumentationKey | Instrumentation Key of your Application Insights | None |
+| healthchecks.appinsights.ConnectString | Connection String of your Application Insights | None | 
+
+Most of them can be configured from the "Advanced Settings" tab in CycleCloud Server GUI:
+
+![Alt](/images/advanced_settings.png "Advanced Settings")
+
+
+### Importing the cluster template into CycleCloud
+
+With CycleCloud CLI, upload the cluster template. Run the commands below to save your cluster settings (such as the region and configuration), and then import the cluster template along with those settings.
+
+```bash
+cyclecloud export_parameters MyClusterName > param.json
+cyclecloud import_cluster --force -f  slurm.txt -c Slurm MyClusterName -p param.json
+```
+
+## Running NHC healthcheck:
+
+Which NHC checks are run is based on the .conf file. By default, this project includes a set of cluster-specific configuration files. If you want to use a custom configuration instead, put your .config file into the nhc-config subfolder within your project's files directory and edit the parameter to reflect that name instead:
+
+![Alt](/images/NHC_configuration.png "NHC Config Name")
+
+Alternatively, you can change the cluster template directly. This can be useful if you are planning to set up multiple clusters using that template:
+
+```ini
+ [[[configuration healthchecks.nhc]]]
+ config = YOUR_CUSTOM_NAME.conf
+```
+
+### Designing custom tests:
+
+You can write your own test scripts to be run by the healthcheck tool. 
+
+1) NHC-based tests (.nhc files) have to be placed in the nhc-tests folder. In order for NHC to actually use them, you will need to create your own configuration files. Just place them in nhc-config folder and pass the name to the NHC config name parameter in the settings
+
+2) Custom test scripts. Whether it is a bash or a python script, anything executable can be a test, as long as it adheres to the following rules:
+
+- Exit code for a passing test is 0. Any non-zero exit code is considered a failure and will be reported
+- To receive a meaningful report on the error, you need to output the message into the stdout
+- If you want the report to contain more information than a single message can convey, you can make your script output a json string - just make sure it has a field "message" that would be used to log the error. If you do this, everything but the message field will end up in the "extra-info" part of the report as a valid json (please refer to the [Sample healthcheck report](##Sample-healthcheck-report) section for an example). If there are any formatting issues or you fail to include the "message" field, the whole json construction will become the reported message instead
+
+## Running custom test scripts:
+
+Put the custom scripts you want the healthcheck tool to run into the custom-tests directory. Update healthchecks.custom.pattern in the cluster-ini template to a pattern that the healthcheck will use to determine which test scripts to run.
+
+![Alt](/images/user_pattern.png "Custom pattern")
+
+Alternatively, you can change the cluster template directly. This can be useful if you are planning to set up multiple clusters using that template:
+
+```ini
+[[[configuration healthchecks.custom]]] 
+pattern = *.sh
+```
+
+All your healthchecks should exit with code 0 upon the successfull pass of a healthcheck, and non-0 otherwise. 
+
+
+## Running the hcheck binary
+
+You should never have to run the tool manually, but in the case you want to do so, here is a list of supported parameters the tool accepts
+
+| Flag | Use | Example | 
+| --- | --- | --- | 
+| --append | Add data to the existing report | --append |
+| --appin | Pass the Application Key to your App Insights | --appin YOUR-KEY |
+| --args | Inline arguments for scripts | --args /tmp/log/report.json |
+| --fin | Output the healthcheck results and exit with the non-zero code if errors were detected | --fin |
+| -k | Path to the test scripts | -k nvidia-smi | 
+| --nr | Number of reruns for the set of scripts | --nr 3 |
+| --pt | Pattern for custom script detection | -pt .sh | 
+| --rpath | Path to where the report would be generated | --rpath /tmp/log/report.json |
+
+
+## Testing the project:
+
+You can test the project by putting your custom scripts returning fixed results into the custom-test folder and setting the healthchecks.custom.pattern to the pattern that would detect them.
+
+C# tool itself also comes with unit tests that you can run yourself by going into the hcheck-test directory and running: 
+
+```bash
+    dotnet test
+```
+
+## Sample healthcheck report
+
+All healthcheck scripts run by the tool are required to exit with a non-zero code upon an error encountered. If you want to store some extra information into the report and have it as a proper json field, make sure your script outputs a valid json that contains a field "message" - that field will be trimmed from the extra information and would be used as a main output of the script. A failure to add a "message" field or errors in json would result in the whole json string used as a message.
+
+```bash
+ {
+  "metadata": 
+    { 
+        "azEnvironment": "AzurePublicCloud",
+        "isHostCompatibilityLayerVm": "false",
+        .
+        .
+    }
+  "testresults": {
+     "nhc": {
+      "exit-code": 0,
+      "message": "",
+      "extra-info": "None"
+    },
+    "full_test_path": {
+      "exit-code": 101,
+      "message": "There was an error!!!\n",
+      "extra-info": "None"
+    },
+    "full_test_path2": {
+      "exit-code": 100,
+      "message": "Fail",
+      "extra-info": {
+        "custom_field": {
+          "custom_subfield": "fail",
+          "custom_subfield2": "pass"
+        }
+      }
+    },
+}
+```
+
+
 
 ## Contributing
 
