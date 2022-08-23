@@ -20,9 +20,7 @@ jobs:
       - name: copy send_log file
         run: cp ./hcheck/hcheck/src/send_log /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/linux-x64/
       - name: tar files
-        run: 
-         cd /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/
-         tar czf hcheck-linux-1.0.9.tgz ./linux-x64
+        run: tar czf hcheck-linux-1.0.9.tgz ./linux-x64
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
