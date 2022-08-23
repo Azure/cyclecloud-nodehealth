@@ -15,6 +15,12 @@ jobs:
         run: |
           cd ./hcheck/hcheck/
           dotnet build -r linux-x64 --self-contained
+      - name: Publish
+        run: dotnet publish ./hcheck/hcheck/hcheck.csproj -c Release -o release -r linux-x64 --self-contained
+      - name: copy send_log file
+        run: cp ./hcheck/hcheck/src/send_log /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/linux-x64/
+      - name: tar files
+        run: tar czf hcheck-linux-1.0.9.tgz /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/linux-x64/
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -32,6 +38,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./hcheck.tgz
-          asset_name: hcheck.tgz
+          asset_path: hcheck-linux-1.0.9.tgz
+          asset_name: hcheck-linux-1.0.9.tgz
           asset_content_type: application/tgz
