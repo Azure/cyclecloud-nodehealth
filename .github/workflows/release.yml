@@ -3,7 +3,7 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     branches:
-    - nidhi0622-release-workflow
+    - nidhi0622-patch-release-workflow
 jobs:
   build:
     name: Upload Release Asset
