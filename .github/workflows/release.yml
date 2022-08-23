@@ -15,7 +15,7 @@ jobs:
         run: |
           cd ./hcheck/hcheck/
           dotnet build -r linux-x64 --self-contained
-          cp ./hcheck/hcheck/src/send_log /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/linux-x64/
+          cp /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/src/send_log /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/linux-x64/
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
