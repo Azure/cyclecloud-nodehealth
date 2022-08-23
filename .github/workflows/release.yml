@@ -1,10 +1,9 @@
+name: Upload Release Asset
 on:
   push:
     # Sequence of patterns matched against refs/tags
     branches:
     - nidhi0622-release-workflow
-name: Upload Release Asset
-
 jobs:
   build:
     name: Upload Release Asset
