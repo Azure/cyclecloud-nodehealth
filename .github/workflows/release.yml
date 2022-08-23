@@ -16,4 +16,6 @@ jobs:
           ls ${{ github.workspace }}
           cd ./hcheck/hcheck/
           dotnet build -r linux-x64 --self-contained
+      - name: Publish
+        run: dotnet publish hcheck.csproj --os linux-64 --self-contained -c Release -o release --no-logo
       - run: echo "🍏 This job's status is ${{ job.status }}."
