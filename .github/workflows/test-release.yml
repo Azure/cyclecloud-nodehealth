@@ -1,0 +1,29 @@
+name: GitHub Actions Demo
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: Build code
+        run: |
+          ls ${{ github.workspace }}
+          cd ./hcheck/hcheck/
+          dotnet build -r linux-x64 --self-contained
+      - name: Publish
+        run: dotnet publish ./hcheck/hcheck/hcheck.csproj -c Release -o release -r linux-x64 --self-contained
+      - name: copy send_log file
+        run: cp ./hcheck/hcheck/src/send_log /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/linux-x64/
+      - name: tar files
+        run: tar czf hcheck-linux-1.0.9.tgz /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/linux-x64/  
+      - name: remove existing file
+        run: rm -f blobs/hcheck-linux-1.0.9.tgz
+      - name: Upload build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+         name: hcheck-linux-1.0.9
+         path: hcheck-linux-1.0.9.tgz
+      - run: echo "🍏 This job's status is ${{ job.status }}."
