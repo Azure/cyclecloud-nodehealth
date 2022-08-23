@@ -24,12 +24,12 @@ jobs:
       - name: Get the version
         id: get_version
         run: 
-         echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+         echo ::set-output name=VERSION::${GITHUB_REF/refs/tags/}
       - name: tar files
         run: | 
          echo ${{ steps.get_version.outputs.version }}
          cd /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/
-         tar czf hcheck-linux-${{github.run_namber}}.tgz ./linux-x64
+         tar czf hcheck-linux-${{ steps.get_version.outputs.version }}.tgz ./linux-x64
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -47,6 +47,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/hcheck-linux-${{github.run_namber}}.tgz
-          asset_name: hcheck-linux-${{github.run_namber}}.tgz
+          asset_path: /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/hcheck-linux-${{ steps.get_version.outputs.version }}.tgz
+          asset_name: hcheck-linux-${{ steps.get_version.outputs.version }}.tgz
           asset_content_type: application/tgz
