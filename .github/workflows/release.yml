@@ -17,5 +17,5 @@ jobs:
           cd ./hcheck/hcheck/
           dotnet build -r linux-x64 --self-contained
       - name: Publish
-        run: dotnet publish hcheck.csproj -c Release -o release --no-logo -r linux-64 --self-contained
+        run: dotnet publish hcheck.csproj -c Release -o release -r linux-64 --self-contained
       - run: echo "🍏 This job's status is ${{ job.status }}."
