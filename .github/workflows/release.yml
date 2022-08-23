@@ -4,6 +4,8 @@ on:
     # Sequence of patterns matched against refs/tags
     branches:
     - nidhi0622-patch-release-workflow
+    tags:
+     - 'v*'
 jobs:
   build:
     name: Upload Release Asset
@@ -22,7 +24,7 @@ jobs:
       - name: Get the version
         id: get_version
         run: 
-         echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+         echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: tar files
         run: | 
          echo ${{ steps.get_version.outputs.version }}
