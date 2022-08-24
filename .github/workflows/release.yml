@@ -27,7 +27,6 @@ jobs:
          echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
       - name: tar files
         run: | 
-         echo ${{ steps.get_version.outputs.version }}
          cd /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/
          tar czf hcheck-linux-${{ steps.get_version.outputs.version }}.tgz ./linux-x64
       - name: Create Release
