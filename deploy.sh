@@ -17,4 +17,4 @@ tar czf $DEST_FILE ./linux-x64
 cd $( dirname $0 )/
 echo \#!/usr/bin/env bash > ./specs/default/cluster-init/files/version.sh
 echo export HEALTHCHECK_VERSION=$VERSION >> ./specs/default/cluster-init/files/version.sh
-cyclecloud project upload azure-storage
+#cyclecloud project upload azure-storage
