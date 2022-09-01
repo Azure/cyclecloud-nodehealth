@@ -15,7 +15,7 @@ public class TestRunnerTest
         FakeProcessRunner fakePr = new FakeProcessRunner();
         fakePr.setParams(0, "Hi\n"); 
         tester.pr = fakePr;
-        tester.RunTest("echo");
+        tester.RunTest("echo", new ArgumentProcessor(new string []{""}));
         Assert.Equal(1, report.metadata.Count);
         Assert.True(report.metadata.ContainsKey("header"));
         Assert.Equal("header-data", report.metadata["header"]);
@@ -30,7 +30,7 @@ public class TestRunnerTest
         FakeProcessRunner fakePr = new FakeProcessRunner();
         fakePr.setParams(0, "Hello, World\n");
         tester.pr = fakePr;
-        tester.RunTest("echo");
+        tester.RunTest("echo", new ArgumentProcessor(new string []{""}));
         report = tester.getReport();
         Assert.True(report.testresults.ContainsKey("echo"));
         Assert.True(report.testresults["echo"].ContainsKey("message"));
@@ -47,7 +47,7 @@ public class TestRunnerTest
         FakeProcessRunner fakePr = new FakeProcessRunner();
         fakePr.setParams(0, "Hello, World\n");
         tester.pr = fakePr;
-        tester.RunTest("echo");
+        tester.RunTest("echo", new ArgumentProcessor(new string []{""}));
         report = tester.getReport();
         Assert.True(report.testresults.ContainsKey("echo"));
         Assert.True(report.testresults["echo"].ContainsKey("exit-code"));
@@ -63,13 +63,13 @@ public class TestRunnerTest
         FakeProcessRunner fakePr = new FakeProcessRunner();
         tester.pr = fakePr;
         fakePr.setParams(0, "Hello, World\n");
-        tester.RunTest("echo");
+        tester.RunTest("echo",new ArgumentProcessor(new string []{""}));
         report = tester.getReport();
         Assert.True(report.testresults.ContainsKey("echo"));
         Assert.True(report.testresults["echo"].ContainsKey("extra-info"));
         Assert.Equal("None", tester.getReport().testresults["echo"]["extra-info"].ToString());
         fakePr.setParams(1, "{ \"some-info\": \"Information\", \"message\": \"This is a message\" }");
-        tester.RunTest(testPath: "complex-test");
+        tester.RunTest(testPath: "complex-test",new ArgumentProcessor(new string []{""}));
         report = tester.getReport();
         Assert.True(report.testresults.ContainsKey("complex-test"));
         Assert.True(report.testresults["complex-test"].ContainsKey("extra-info"));
@@ -94,9 +94,9 @@ public class TestRunnerTest
         FakeProcessRunner fakePr = new FakeProcessRunner();
         tester.pr = fakePr;
         fakePr.setParams(0, "Hello, World\n");
-        tester.RunTest("echo");
+        tester.RunTest("echo",new ArgumentProcessor(new string []{""}));
         fakePr.setParams(100, "");
-        tester.RunTest("bash");
+        tester.RunTest("bash",new ArgumentProcessor(new string []{""}));
         report = tester.getReport();
         Assert.Equal(2, report.testresults.Count);
         Assert.True(report.testresults.ContainsKey("echo"));
@@ -121,7 +121,7 @@ public class TestRunnerTest
         {
             fakePr.setParams(i, "");
             if (i == 1) fakePr.setParams(i, "Special message");
-            tester.RunTest("bash");
+            tester.RunTest("bash",new ArgumentProcessor(new string []{""}));
         }
         report = tester.getReport();
         Assert.Equal(1, report.testresults.Count);

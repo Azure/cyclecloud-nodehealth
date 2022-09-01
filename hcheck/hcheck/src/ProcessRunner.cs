@@ -23,11 +23,11 @@ namespace hcheck
         public bool isSuccess = false;
         public DateTime startTime;
         public DateTime exitTime;
-        public virtual void RunProcess(string filePath, string []? args = null, int timeout = 1000)
+        public virtual void RunProcess(string filePath, string[] args = null, int timeout = 1000)
         {
             using (System.Diagnostics.Process pProcess = new System.Diagnostics.Process())
             {
-                args = (args == null) ? new string[]{} : args;
+                args = (args == null) ? new string[] { } : args;
                 try
                 {
                     isSuccess = false;
@@ -45,12 +45,12 @@ namespace hcheck
                     startTime = DateTime.Now;
                     pProcess.Start();
                     bool finished = pProcess.WaitForExit(timeout);
-                    exitTime = pProcess.ExitTime; 
                     if (finished)
                     {
                         stdout = pProcess.StandardOutput.ReadToEnd(); //The output result
                         stderr = pProcess.StandardError.ReadToEnd();
                         exitCode = pProcess.ExitCode;
+                        exitTime = pProcess.ExitTime;
                         isSuccess = true;
                         stderr = "";
                     }
@@ -67,7 +67,7 @@ namespace hcheck
                             stderr += " " + ex.Message;
                         }
                         exitCode = pProcess.ExitCode;
-                        exitTime = startTime; 
+                        exitTime = startTime;
                     }
                 }
                 catch (Exception ex)

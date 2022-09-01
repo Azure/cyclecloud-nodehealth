@@ -29,7 +29,8 @@ jetpack download hcheck-linux-$HEALTHCHECK_VERSION.tgz --project healthcheck $IN
 cd $INSTALL_DIR
 sudo tar xzf $INSTALL_DIR/hcheck-linux-$HEALTHCHECK_VERSION.tgz
 mkdir -p sbin
-mv $INSTALL_DIR/linux-x64/send_log.py $INSTALL_DIR/sbin/send_log.py
+mv $INSTALL_DIR/linux-x64/send_log $INSTALL_DIR/sbin/send_log
+chmod +x $INSTALL_DIR/sbin/send_log
 
 
 
@@ -43,7 +44,7 @@ $INSTALL_DIR/nhc-runner.sh -L || true
 APPLICATIONINSIGHTS_CONNECTION_STRING=$(jq -r '.appinsights.ConnectString' ${HCHECK_SETTINGS_PATH})
 INSTRUMENTATION_KEY=$(jq -r '.appinsights.InstrumentationKey' ${HCHECK_SETTINGS_PATH})
 sudo -i
-$INSTALL_DIR/linux-x64/hcheck --rpath $REPORT_PATH --fin --appin $INSTRUMENTATION_KEY --rscript $INSTALL_DIR/sbin/send_log.py --python "/opt/cycle/jetpack/system/embedded/bin/python3.8"
+$INSTALL_DIR/linux-x64/hcheck --rpath $REPORT_PATH --fin --appin $INSTRUMENTATION_KEY --rscript $INSTALL_DIR/sbin/send_log
 #| 
 #while IFS= read -r line
  # do

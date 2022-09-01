@@ -92,7 +92,7 @@ namespace hcheck
                     tryConvert = test.Value["test-time"].ToString();
                     string testTime = (tryConvert == null) ? "0" : tryConvert;
                     if (logMessage.Last<char>() != '\n') logMessage += "\n";
-                    if (args.ScriptRunnerPath == "")
+                    if (args.PythonPath == "")
                     {
                         string[] arguments = { "--level", "error", "-m", logMessage, "--info", extraInfo, "--code", exitCode.ToString(),
                                             "--testname", testName, "--nodeid", nodeId, "--time", testTime, "--error", message};
@@ -103,7 +103,7 @@ namespace hcheck
                         //python scripts require python to run and jetpack is a python install
                         string[] arguments = { args.ReportScriptPath, "--level", "error", "-m", logMessage, "--info", extraInfo, "--code", exitCode.ToString(),
                                             "--testname", testName, "--nodeid", nodeId, "--time", testTime, "--error", message};
-                        pr.RunProcess(args.ScriptRunnerPath, arguments, 10000);
+                        pr.RunProcess(args.PythonPath, arguments, 10000);
                     }
                     if (appInsW != null) appInsW.Send(message).Wait();
                     return message;

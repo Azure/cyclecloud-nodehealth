@@ -23,8 +23,12 @@ namespace hcheck
 
             if (report.testresults[testPath].ContainsKey("repeat-history"))
             {
-                LinkedList<object> list = (LinkedList<object>)report.testresults[testPath]["repeat-history"];
+                LinkedList<object> list= JsonSerializer.Deserialize< LinkedList<object>>( report.testresults[testPath]["repeat-history"].ToString());
                 list.AddLast(testResults);
+                report.testresults[testPath]["repeat-history"] = list;
+                //LinkedList<object> list = (LinkedList<object>)report.testresults[testPath]["repeat-history"];
+                //list.AddLast(testResults);
+
             }
             else
             {
@@ -42,7 +46,9 @@ namespace hcheck
             }
         }
 
-        public void RunTest(string testPath, string pythonPath = "")
+
+
+        public void RunTest(string testPath, ArgumentProcessor args)
         {
             //consern: properly initialize the test, success or fail
             //how long took,  collect results, write the report
@@ -50,9 +56,21 @@ namespace hcheck
             //invoke nvidia-smi 
             if (pr == null) pr = new ProcessRunner();
             //python scripts need to be run with a python installation
-            if (Path.GetExtension(testPath) == ".py" && pythonPath != "")
+            if (args.ReframePath != "")
             {
-                pr.RunProcess(pythonPath, new string[] { "-u", testPath });
+                string? reportPath = Path.GetDirectoryName(args.FilePath);
+                // string actualReportPath = (reportPath == null) ? "/var/log/reframe_results.json" : reportPath + "reframe_results.json";
+                string actualReportPath = "/var/log/reframe_results.json";
+                pr.RunProcess(args.ReframePath, new string[] { "-C",args.ReframeConfigPath,"--force-local","--report-file", actualReportPath,"-c", testPath, "-R","-r" }, 10000);
+                if (!pr.isSuccess)
+                {
+                    Console.WriteLine("There was an error in launching the script: " + pr.stderr);
+                    return;
+                }
+                else
+                    Console.WriteLine("reframe ran with output " + pr.stdout);
+                string reframeErrorMessage = ReframeWorker.ReadReframeReport(actualReportPath);
+                pr.stdout = (reframeErrorMessage == "") ? "No message" : reframeErrorMessage;
             }
             else
             {

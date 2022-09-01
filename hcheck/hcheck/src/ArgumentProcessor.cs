@@ -22,12 +22,12 @@ namespace hcheck
             }
         }
 
-        private string _scriptRunnerPath = "";
-        public string ScriptRunnerPath
+        private string _pythonPath = "";
+        public string PythonPath
         {
             get
             {
-                return _scriptRunnerPath;
+                return _pythonPath;
             }
         }
         private bool _isPath = false;
@@ -39,6 +39,17 @@ namespace hcheck
                 return _isPath;
             }
         }
+
+        private string _reframePath = "";
+
+        public string ReframePath
+        {
+            get
+            {
+                return _reframePath;
+            }
+        }
+
         private bool _isPattern = false;
 
         public bool IsPattern
@@ -105,9 +116,15 @@ namespace hcheck
             }
         }
 
+        private string _reframeConfigPath = "";
 
-        // public string commandArgs = "";
-
+        public string ReframeConfigPath
+        {
+            get
+            {
+                return _reframeConfigPath;
+            }
+        }
         public ArgumentProcessor(string[]? args)
         {
             this.args = args;
@@ -165,15 +182,23 @@ namespace hcheck
                         {
                             _instrumentationKey = args[i + 1];
                         }
-                         // report errors to App Insights 
+                        // report errors to App Insights 
                         else if (args[i] == "--rscript")
                         {
                             _reportScriptPath = args[i + 1];
                         }
-                           // report errors to App Insights 
+                        // report errors to App Insights 
                         else if (args[i] == "--python")
                         {
-                            _scriptRunnerPath = args[i + 1];
+                            _pythonPath = args[i + 1];
+                        }
+                        else if (args[i] == "--reframe")
+                        {
+                            _reframePath = args[i + 1];
+                        }
+                        else if (args[i] == "--config")
+                        {
+                            _reframeConfigPath = args[i + 1];
                         }
                     }
                 }

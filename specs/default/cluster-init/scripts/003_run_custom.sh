@@ -23,11 +23,11 @@ REPORT_PATH=$(jq -r '.report' ${HCHECK_SETTINGS_PATH})
 #whereis jetpack
 #exit 1
 
+
 APPLICATIONINSIGHTS_CONNECTION_STRING=$(jq -r '.appinsights.ConnectString' ${HCHECK_SETTINGS_PATH})
 INSTRUMENTATION_KEY=$(jq -r '.appinsights.InstrumentationKey' ${HCHECK_SETTINGS_PATH})
 $INSTALL_DIR/linux-x64/hcheck -k $INSTALL_DIR/custom-tests --pt "$TEST_PATTERN" --append --rpath $REPORT_PATH
-
-$INSTALL_DIR/linux-x64/hcheck --rpath $REPORT_PATH --fin --appin $INSTRUMENTATION_KEY --rscript $INSTALL_DIR/sbin/send_log.py --python "/opt/cycle/jetpack/system/embedded/bin/python3.8"
+$INSTALL_DIR/linux-x64/hcheck --rpath $REPORT_PATH --fin --appin $INSTRUMENTATION_KEY --rscript $INSTALL_DIR/sbin/send_log
 # |
 # while IFS= read -r line
 # do

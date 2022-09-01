@@ -124,7 +124,7 @@ namespace hcheck
                         {
                             foreach (string testname in files)
                             {
-                                tester.RunTest(testname, args.ScriptRunnerPath);
+                                tester.RunTest(testname, args);
                             }
                         }
                     }
@@ -137,7 +137,7 @@ namespace hcheck
                 {
                     try
                     {
-                        tester.RunTest(args.TestDir, args.ScriptRunnerPath);
+                        tester.RunTest(args.TestDir, args);
                     }
                     catch (Exception ex)
                     {
