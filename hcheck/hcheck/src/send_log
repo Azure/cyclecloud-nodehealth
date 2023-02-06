@@ -1,0 +1,117 @@
+#!/opt/cycle/jetpack/system/embedded/bin/python3
+
+from jetpack import util
+import time
+import json
+import sys
+import argparse
+
+
+class SendError(Exception):
+    pass
+
+
+class LogError(Exception):
+    pass
+
+
+def detailed_log(message, exit_code, extra_info, node_id, test_name, error_message, test_time = 0, level = "error", priority=None):
+    if level not in ["info", "warn", "error"]:
+        raise LogError("Invalid level: %s" % level)
+
+    priority = priority or _get_priority(level)
+
+    message_data = {
+        "level": level,
+        "message": message,
+        "priority": priority,
+        "exit_code": exit_code,
+        "extra_info": extra_info,
+        "node_id": node_id,
+        "test_name": test_name,
+        "test_time": test_time,
+        "error_message": error_message
+    }
+    
+    send_internal_message(message_data, "log")
+
+def send_internal_message(message_data, message_type):
+    '''
+    Sends a system message to CycleCloud
+    parameters:
+      message_data - this is a python dictionary
+      message_type - type of message, examples are test, log, installation
+    '''
+    if not isinstance(message_data, dict):
+        raise SendError("message_data parameter must be a dictionary")
+
+    config = util.parse_config(None)
+    
+    try:
+        identity = config["identity"]
+        cluster_session_id = identity.get('cluster_session_id')
+        cluster_name = identity["cluster_name"]
+        instance_id = identity["instance_id"]
+        cycle_server_config = config['cycle_server']
+    except KeyError as e:
+        raise SendError("Unable to find '%s' in config" % str(e))
+
+    message_obj = {
+        "cluster_name": cluster_name,
+        "instance_id": instance_id,
+        "timestamp": util.iso_8601_timestamp(),
+        "cluster_session_id": cluster_session_id,
+        "type": message_type,
+        "data": message_data
+    }
+
+    def func():
+        r = _post_message(message_obj)
+        if r.status != 202:
+            raise Exception("Failed to send message: %d" % r.status)
+
+    return _retry_func(func)
+
+
+def _post_message(message_obj):
+    return util.query_cyclecloud("/clusterlink/messages", body=json.dumps({"messages": [message_obj]}), method="POST")
+
+
+def _retry_func(func):
+    wait_length = 5
+
+    while True:
+        try:
+            return func()
+        except Exception as e:
+            # retry 5 times, waiting 5, 10, 20, then 40 seconds
+            if wait_length < 41:
+                time.sleep(wait_length)
+                wait_length *= 2
+            else:
+                raise e
+
+def _get_priority(level):
+    if level == 'info':
+        log_priority = 'medium'
+    elif level == 'warn':
+        log_priority = 'medium'
+    elif level == 'error':
+        log_priority = 'high'
+    else:
+        raise LogError("Invalid log level")
+    return log_priority
+
+parser = argparse.ArgumentParser(description='Send detailed healthcheck logs to CycleCloud')
+parser.add_argument("-m", "--message", help="message displayed in CycleCloud logs")
+parser.add_argument("--info", help="extra information about the tests in json format")
+parser.add_argument("--code", help="exit code of the test")
+parser.add_argument("--testname", help="name of the test")
+parser.add_argument("--nodeid", help="the id of the vm the tests were run on")
+parser.add_argument("--time", help="the time it took to run the test in ms")
+parser.add_argument("-l", "--level", help="the level the log should be submitted at")
+parser.add_argument("--error", help="the error message retured by the test script")
+
+args = parser.parse_args()
+
+detailed_log(args.message, args.code, args.info, args.nodeid, args.testname, args.error, args.time)

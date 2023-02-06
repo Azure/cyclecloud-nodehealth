@@ -26,7 +26,7 @@ public class HealthcheckTest
     {
         using (TestScriptGenerator tsg = new TestScriptGenerator("print(\"Hello, python world\")\nexit(0)", true))
         {
-            string[] args = { "-k", tsg.Path, "--rpath", "./report.json", "--python", "python3"};
+            string[] args = { "-k", tsg.Path, "--rpath", "./report.json"};
             Healthcheck.Main(args);
             ArgumentProcessor argus = new ArgumentProcessor(args);
             ReportBuilder builder = new ReportBuilder(argus, argus.FilePath);

@@ -23,7 +23,7 @@ namespace hcheck
         public bool isSuccess = false;
         public DateTime startTime;
         public DateTime exitTime;
-        public virtual void RunProcess(string filePath, string[] args = null, int timeout = 1000)
+        public virtual void RunProcess(string filePath, string[]? args = null, int timeout = 1000)
         {
             using (System.Diagnostics.Process pProcess = new System.Diagnostics.Process())
             {

@@ -17,6 +17,6 @@ cp ../../../src/send_log /linux-x64
 tar czf hcheck-linux-$VERSION.tgz linux-x64
 cp hcheck-linux-$VERSION.tgz ../../../../../blobs/ 
 cd $( dirname $0 )/
-echo \#!/usr/bin/env bash > ../../../../../specs/default/cluster-init/files/version.sh
-echo export HEALTHCHECK_VERSION=$VERSION >> ../../../../../specs/default/cluster-init/files/version.sh
+echo \#!/usr/bin/env bash > ./specs/default/cluster-init/files/version.sh
+#echo export HEALTHCHECK_VERSION=$VERSION >> ./specs/default/cluster-init/files/version.sh
 #cyclecloud project upload azure-storage
