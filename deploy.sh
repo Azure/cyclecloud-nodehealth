@@ -13,7 +13,7 @@ VERSION=$(cyclecloud project info | grep Version | cut -d: -f2 | cut -d" " -f2)
 DEST_FILE=$(pwd)/blobs/hcheck-linux-$VERSION.tgz
 rm -f $DEST_FILE
 cd ./bin/Debug/net6.0/
-cp ../../../src/send_log /linux-x64
+cp ../../../src/send_log linux-x64
 tar czf hcheck-linux-$VERSION.tgz linux-x64
 cp hcheck-linux-$VERSION.tgz ../../../../../blobs/ 
 cd $( dirname $0 )/
