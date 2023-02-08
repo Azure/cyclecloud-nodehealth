@@ -101,7 +101,7 @@ NHC_CONF_NAME=$(jq -r '.nhc.config' ${HCHECK_JSON})
 
 if [[ $NHC_CONF_NAME == null ]]
 then
-    $NHC_CONF_NAME=$(jetpack config azure.metadata.compute.vmSize).conf
+    NHC_CONF_NAME=$(jetpack config azure.metadata.compute.vmSize).conf
 fi
 
 
