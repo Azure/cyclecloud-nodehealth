@@ -22,6 +22,14 @@ namespace hcheck
             }
         }
 
+        private string _pythonPath = "";
+        public string PythonPath
+        {
+            get
+            {
+                return _pythonPath;
+            }
+        }
         private bool _isPath = false;
 
         public bool IsPath
@@ -29,6 +37,16 @@ namespace hcheck
             get
             {
                 return _isPath;
+            }
+        }
+
+        private string _reframePath = "";
+
+        public string ReframePath
+        {
+            get
+            {
+                return _reframePath;
             }
         }
 
@@ -97,6 +115,16 @@ namespace hcheck
                 return _filePath;
             }
         }
+
+        private string _reframeConfigPath = "";
+
+        public string ReframeConfigPath
+        {
+            get
+            {
+                return _reframeConfigPath;
+            }
+        }
         public ArgumentProcessor(string[]? args)
         {
             this.args = args;
@@ -154,10 +182,23 @@ namespace hcheck
                         {
                             _instrumentationKey = args[i + 1];
                         }
-                        // external script reporting to CycleCloud 
+                        // report errors to App Insights 
                         else if (args[i] == "--rscript")
                         {
                             _reportScriptPath = args[i + 1];
+                        }
+                        // report errors to App Insights 
+                        else if (args[i] == "--python")
+                        {
+                            _pythonPath = args[i + 1];
+                        }
+                        else if (args[i] == "--reframe")
+                        {
+                            _reframePath = args[i + 1];
+                        }
+                        else if (args[i] == "--config")
+                        {
+                            _reframeConfigPath = args[i + 1];
                         }
                     }
                 }

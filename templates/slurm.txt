@@ -186,6 +186,9 @@ Autoscale = $Autoscale
             [[[configuration healthchecks.custom]]]
             pattern = $CustomScriptPattern
 
+            [[[configuration healthchecks.reframe]]]
+            pattern = $ReframeScriptPattern
+
             [[[configuration healthchecks.nhc]]]
             config = $NHCConf
             log = /var/log/nhc.log
@@ -610,4 +613,11 @@ Order = 20
         [[[parameter ConnectString]]]
         Label = Connection String
         Description = The Application Insights Connection String
+
+         
+        [[[parameter ReframeScriptPattern]]]
+        Label = ReFrame Script Pattern
+        Description = The pattern used to detect ReFrame tests
+
+        
     

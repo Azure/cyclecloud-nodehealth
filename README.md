@@ -134,6 +134,54 @@ Whether it is a bash or a python script, anything executable can be a test, as l
 - To receive a meaningful report on the error, you need to output the message into the stdout
 - If you want the report to contain more information than a single message can convey, you can make your script output a json string - just make sure it has a field "message" that would be used to log the error. If you do this, everything but the message field will end up in the "extra-info" part of the report as a valid json (please refer to the [Sample healthcheck report](#sample-healthcheck-report) section for an example). If there are any formatting issues or you fail to include the "message" field, the whole json construction will become the reported message instead
 
+
+## Running reframe test scripts
+
+Update healthchecks.custom.pattern in the cluster-ini template to a pattern that the healthcheck will use to determine which test scripts to run.
+
+![Alt](/images/reframe_pattern.png "Reframe pattern")
+
+Alternatively, you can change the cluster template directly. This can be useful if you are planning to set up multiple clusters using that template:
+
+```ini
+[[[configuration healthchecks.reframe]]] 
+pattern = *.py
+```
+003_run_reframe.sh basically clones Jon shelly's repo to install and run reframe tests and then like other tests uses hcheck project to send log to cyclecloud and generate a report.
+
+## Developer testing for reframe scripts
+
+Example configuration for reframe tests for Dev testing:
+If you are using Centos then you would need to edit the azure_centos_7.py file present in Jon Shelly's repo https://github.com/JonShelley/reframe/blob/master/azure_nhc/config/azure_centos_7.py to include the sku configuration in following way:
+```bash
+site_configuration = {
+    'systems': [
+        {
+            'name': 'fs_v2',
+            'descr': 'Azure FV2',
+            'vm_data_file': 'azure_nhc/vm_info/azure_vms_dataset.json',
+            'vm_size': 'F2s_v2',
+            'hostnames': ['*'],
+            'modules_system': 'tmod32',
+            'partitions': [
+                {
+                    'name': 'hpc',
+                    'scheduler': 'slurm',
+                    'launcher': 'srun',
+                    'max_jobs': 100,
+                    'access': ['-p hpc'],
+                    'environs': ['builtin'],
+                    'prepare_cmds': ['source /etc/profile.d/modules.sh']
+                }
+            ]
+        },
+    ]
+  }
+```
+   You need to replace the config file in 003_run_reframe.sh script after cloning the repo example below:
+    cp azure_nhc/config/azure_centos_7.py azure_nhc/config/azure_centos_7_backup.py
+    cp ${CYCLECLOUD_SPEC_PATH}/files/azure_centos_7.py azure_nhc/config/azure_centos_7.py
+
 ## Running the hcheck binary
 
 You should never have to run the tool manually, but in the case you want to do so, here is a list of supported parameters the tool accepts
@@ -148,7 +196,10 @@ You should never have to run the tool manually, but in the case you want to do s
 | --nr | Number of reruns for the set of scripts | --nr 3 |
 | --pt | Pattern for custom script detection | -pt .sh | 
 | --rpath | Path to where the report would be generated | --rpath /tmp/log/report.json |
-| --rscript | Path to the script reporting the results back to the portal | --rscript ./send_logs |
+| --rscript | Path to the script reporting the results back to the portal | --rscript ./send_logs | 
+| --python | Path used to specify where python code is to report errors to App Insights | --python /send_log_appInsights |
+| --reframe | Path used to specify where reframe is installed. | --reframe /reframe/bin/reframe |
+| --config | Path used to specify where the reframe tests config file is present | --config /reframe/azure_nhc/config/azure_centos_7.py |
 
 ## Changing the script for reporting errors
 
