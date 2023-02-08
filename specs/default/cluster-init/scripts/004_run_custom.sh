@@ -34,4 +34,3 @@ $INSTALL_DIR/linux-x64/hcheck --rpath $REPORT_PATH --fin --appin $INSTRUMENTATIO
 # jetpack log --level error "$line";
 # done
 # exit ${PIPESTATUS[0]}
-#exit $?

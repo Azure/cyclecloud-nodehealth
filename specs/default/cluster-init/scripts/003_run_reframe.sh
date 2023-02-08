@@ -19,8 +19,6 @@ if ! [[ -f  $INSTALL_DIR/reframe/bin/reframe ]]
     curl -L -k https://github.com/JonShelley/reframe/tarball/master  | tar -xz --strip-components 1
     ./bootstrap.sh
     ./bin/reframe -V
-    cp azure_nhc/config/azure_centos_7.py azure_nhc/config/azure_centos_7_backup.py
-    cp ${CYCLECLOUD_SPEC_PATH}/files/azure_centos_7.py azure_nhc/config/azure_centos_7.py
 else
     echo "Warning: Did not install ReFrame (looks like it already has been installed)"
     cd reframe  
@@ -54,4 +52,3 @@ APPLICATIONINSIGHTS_CONNECTION_STRING=$(jq -r '.appinsights.ConnectString' ${HCH
 INSTRUMENTATION_KEY=$(jq -r '.appinsights.InstrumentationKey' ${HCHECK_SETTINGS_PATH})
 $INSTALL_DIR/linux-x64/hcheck -k $INSTALL_DIR/reframe/azure_nhc/run_level_2  --append --rpath $REPORT_PATH --reframe $INSTALL_DIR/reframe/bin/reframe --config $INSTALL_DIR/reframe/azure_nhc/config/${reframe_cfg}
 $INSTALL_DIR/linux-x64/hcheck --rpath $REPORT_PATH --fin --appin $INSTRUMENTATION_KEY --rscript $INSTALL_DIR/sbin/send_log
-#exit $?
