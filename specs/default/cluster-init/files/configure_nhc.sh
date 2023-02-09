@@ -82,7 +82,7 @@ function copy_extra_test_files() {
     done
 }
 
-#mkdir /var/run/nhc
+mkdir /var/run/nhc
 #NHC_CONF_FILE_NEW=`readJson ${CYCLECLOUD_SPEC_PATH}/files/nhc-config.json config` || exit 1;
 #NHC_CONF_FILE_NEW=`echo ${CYCLECLOUD_SPEC_PATH}/files/nhc-config.txt` || exit 1;
 #$CYCLECLOUD_SPEC_PATH/files/$(jetpack config healthchecks.nhc.config)
