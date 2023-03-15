@@ -14,15 +14,21 @@ jobs:
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |
           cd ./hcheck/hcheck/
-          dotnet build -r linux-x64 --self-contained
+          dotnet build --use-current-runtime
       - name: Publish
-        run: dotnet publish ./hcheck/hcheck/hcheck.csproj -c Release -o release -r linux-x64 --self-contained
+        run: dotnet publish ./hcheck/hcheck/hcheck.csproj -c Release -o release --use-current-runtime
       - name: copy send_log file
         run: cp ./hcheck/hcheck/src/send_log /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/linux-x64/
       - name: Get the version
         id: get_version
         run: 
          echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+      - name: download nhc scripts
+        run: | 
+         curl https://codeload.github.com/Azure/azurehpc/tar.gz/master |
+         tar -xz --strip=7 azurehpc-master/experimental/cc_slurm_nhc/cc_slurm_nhc/specs/default/cluster-init
+         cp ./files/*.conf /home/runner/work/cyclecloud-nodehealth/specs/default/cluster-init/files/nhc-config/
+         cp ./files/*.nhc /home/runner/work/cyclecloud-nodehealth/specs/default/cluster-init/files/nhc-tests/
       - name: tar files
         run: | 
          echo ${{ steps.get_version.outputs.version }}

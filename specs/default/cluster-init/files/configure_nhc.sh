@@ -98,10 +98,12 @@ HCHECK_JSON=${HCHECK_FILES}${HCHECK_CONFIG}
 #NHC_CONF_FILE_NEW=${CYCLECLOUD_SPEC_PATH}/files/$(jq -r '.nhc.config' ${HCHECK_JSON})
 
 NHC_CONF_NAME=$(jq -r '.nhc.config' ${HCHECK_JSON})
+NHC_TIMEOUT=$(jq -r '.nhc.timeout' ${HCHECK_JSON})
+
 
 if [[ $NHC_CONF_NAME == null ]]
 then
-    $NHC_CONF_NAME=$(jetpack config azure.metadata.compute.vmSize).conf
+    NHC_CONF_NAME=$(jetpack config azure.metadata.compute.vmSize).conf
 fi
 
 

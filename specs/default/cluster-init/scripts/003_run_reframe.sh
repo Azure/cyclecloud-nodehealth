@@ -50,5 +50,5 @@ REPORT_PATH=$(jq -r '.report' ${HCHECK_SETTINGS_PATH})
 
 APPLICATIONINSIGHTS_CONNECTION_STRING=$(jq -r '.appinsights.ConnectString' ${HCHECK_SETTINGS_PATH})
 INSTRUMENTATION_KEY=$(jq -r '.appinsights.InstrumentationKey' ${HCHECK_SETTINGS_PATH})
-$INSTALL_DIR/linux-x64/hcheck -k $INSTALL_DIR/reframe/azure_nhc/run_level_2  --append --rpath $REPORT_PATH --reframe $INSTALL_DIR/reframe/bin/reframe --config $INSTALL_DIR/reframe/azure_nhc/config/${reframe_cfg}
-$INSTALL_DIR/linux-x64/hcheck --rpath $REPORT_PATH --fin --appin $INSTRUMENTATION_KEY --rscript $INSTALL_DIR/sbin/send_log
+#$INSTALL_DIR/linux-x64/hcheck -k $INSTALL_DIR/reframe/azure_nhc/run_level_2  --append --rpath $REPORT_PATH --reframe $INSTALL_DIR/reframe/bin/reframe --config $INSTALL_DIR/reframe/azure_nhc/config/${reframe_cfg}
+#$INSTALL_DIR/linux-x64/hcheck --rpath $REPORT_PATH --fin --appin $INSTRUMENTATION_KEY --rscript $INSTALL_DIR/sbin/send_log

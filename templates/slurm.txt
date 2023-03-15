@@ -192,6 +192,7 @@ Autoscale = $Autoscale
             [[[configuration healthchecks.nhc]]]
             config = $NHCConf
             log = /var/log/nhc.log
+            timeout = $NHCTimeout
 
 
 
@@ -580,7 +581,7 @@ Order = 20
 
         [[[parameter UsePublicNetwork]]]
         Label = Public Head Node
-        DefaultValue = true
+        DefaultValue = false
         ParameterType = Boolean
         Config.Label = Access scheduler node from the Internet
 
@@ -598,6 +599,10 @@ Order = 20
         [[[parameter NHCConf]]]
         Label = NHC Config Name
         Description = The name of the configuration file used to perform NHC healthchecks
+
+         [[[parameter NHCTimeout]]]
+        Label = NHC Test Timeour
+        Description = The number of miliseconds it would take for NHC tests to time out
 
         [[[parameter CustomScriptPattern]]]
         Label = User Scripts Pattern
