@@ -14,9 +14,7 @@ cd $INSTALL_DIR
 
 if ! [[ -f  $INSTALL_DIR/reframe/bin/reframe ]]
     then
-    mkdir reframe
-    cd reframe
-    curl -L -k https://github.com/JonShelley/reframe/tarball/master  | tar -xz --strip-components 1
+    cd $CYCLECLOUD_SPEC_PATH/files/reframe
     ./bootstrap.sh
     ./bin/reframe -V
 else

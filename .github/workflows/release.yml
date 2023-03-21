@@ -1,4 +1,4 @@
-name: Upload Release Asset
+name: Test Upload Release Asset
 on:
   push:
     # Sequence of patterns matched against refs/tags
@@ -7,6 +7,11 @@ on:
 jobs:
   build:
     name: Upload Release Asset
+    permissions:
+     id-token: write
+     contents: write
+     issues: write
+     pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,21 +32,32 @@ jobs:
         run: | 
          curl https://codeload.github.com/Azure/azurehpc/tar.gz/master |
          tar -xz --strip=7 azurehpc-master/experimental/cc_slurm_nhc/cc_slurm_nhc/specs/default/cluster-init
-         cp ./files/*.conf /home/runner/work/cyclecloud-nodehealth/specs/default/cluster-init/files/nhc-config/
-         cp ./files/*.nhc /home/runner/work/cyclecloud-nodehealth/specs/default/cluster-init/files/nhc-tests/
+         cp ./files/*.conf /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/specs/default/cluster-init/files/nhc-config/
+         mkdir /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/specs/default/cluster-init/files/nhc-tests/
+         cp ./files/*.nhc /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/specs/default/cluster-init/files/nhc-tests/
+      - name: download reframe scripts
+        run: | 
+         mkdir /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/specs/default/cluster-init/files/reframe/
+         cd /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/specs/default/cluster-init/files/reframe/
+         curl -L -k https://github.com/JonShelley/reframe/tarball/master  | tar -xz --strip-components 1      
       - name: tar files
         run: | 
          echo ${{ steps.get_version.outputs.version }}
          cd /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/
          tar czf hcheck-linux-${{ steps.get_version.outputs.version }}.tgz ./linux-x64
+      - name: tar source + loaded tests
+        run: | 
+         echo ${{ steps.get_version.outputs.version }}
+         cd /home/runner/work/cyclecloud-nodehealth
+         tar czf hcheck-cc-project-${{ steps.get_version.outputs.version }}.tgz ./cyclecloud-nodehealth
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag: ${{ github.ref }}
+          name: Release ${{ github.ref }}
           draft: false
           prerelease: true
       - name: Upload Release Asset
@@ -53,4 +69,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
           asset_path: /home/runner/work/cyclecloud-nodehealth/cyclecloud-nodehealth/hcheck/hcheck/bin/Release/net6.0/hcheck-linux-${{ steps.get_version.outputs.version }}.tgz
           asset_name: hcheck-linux-${{ steps.get_version.outputs.version }}.tgz
+          asset_content_type: application/tgz
+      - name: Upload CC Project
+        id: upload-cc-project 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: /home/runner/work/cyclecloud-nodehealth/hcheck-cc-project-${{ steps.get_version.outputs.version }}.tgz
+          asset_name: hcheck-cc-project-${{ steps.get_version.outputs.version }}.tgz
           asset_content_type: application/tgz
