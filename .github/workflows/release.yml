@@ -22,7 +22,7 @@ jobs:
       - name: Get the version
         id: get_version
         run: 
-         echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+         echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
       - name: tar files
         run: | 
          echo ${{ steps.get_version.outputs.version }}
